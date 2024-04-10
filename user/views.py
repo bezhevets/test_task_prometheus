@@ -8,15 +8,24 @@ from user.serializers import UserSerializer, AuthTokenSerializer
 
 
 class CreateUserView(generics.CreateAPIView):
+    """Register new user"""
+
     serializer_class = UserSerializer
 
 
 class CreateTokenView(ObtainAuthToken):
+    """After login user get auth token"""
+
     renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
     serializer_class = AuthTokenSerializer
 
 
 class ManageUserView(generics.RetrieveUpdateAPIView):
+    """Profile detail.
+
+    update:
+    User can change password"""
+
     serializer_class = UserSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
