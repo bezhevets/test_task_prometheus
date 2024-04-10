@@ -9,6 +9,18 @@ from post.serializers import PostSerializer, PostListSerializer, LikeSerializer
 
 
 class PostViewSet(viewsets.ModelViewSet):
+    """API endpoint for managing post.
+
+    list:
+    Retrieve a list of posts.
+
+    retrieve:
+    Retrieve details of a specific post.
+
+    create:
+    Create a new post.
+    """
+
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     permission_classes = (
@@ -24,6 +36,8 @@ class PostViewSet(viewsets.ModelViewSet):
         return PostSerializer
 
     def create(self, request, *args, **kwargs):
+        """Creating a new post, only by registered and authenticated users."""
+
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save(owner=self.request.user)
@@ -37,6 +51,7 @@ class PostViewSet(viewsets.ModelViewSet):
     )
     def create_like(self, request, pk=None):
         """Like or unlike a post."""
+
         post = self.get_object()
         user = self.request.user
 
