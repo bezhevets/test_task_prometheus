@@ -19,6 +19,12 @@ class PostViewSet(viewsets.ModelViewSet):
 
     create:
     Create a new post.
+
+    update:
+    Only post owners can update.
+
+    delete:
+    Only post owners can delete.
     """
 
     queryset = Post.objects.all()
