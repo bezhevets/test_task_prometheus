@@ -33,7 +33,11 @@ class PostViewSet(viewsets.ModelViewSet):
     Only post owners can delete.
     """
 
-    queryset = Post.objects.all().select_related("owner").prefetch_related("likes")
+    queryset = (
+        Post.objects.all()
+        .select_related("owner")
+        .prefetch_related("likes", "likes__owner")
+    )
     serializer_class = PostSerializer
     permission_classes = (
         IsAuthenticatedOrReadOnly,
