@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from django.db.models import Count
+from django.db.models.functions import TruncDate
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiResponse
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
@@ -132,15 +134,17 @@ class AnalyticsLikeView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        likes_data = Like.objects.filter(created_at__range=[date_from, date_to])
-        likes_aggregated = {}
+        likes_aggregated = (
+            Like.objects.filter(created_at__range=[date_from, date_to])
+            .annotate(date=TruncDate("created_at"))
+            .values("date")
+            .annotate(total_likes=Count("id"))
+            .order_by("date")
+        )
 
-        for like in likes_data:
-            date = like.created_at.date()
-            date = str(date)
-            if date in likes_aggregated:
-                likes_aggregated[date] += 1
-            else:
-                likes_aggregated[date] = 1
+        result = {
+            like["date"].strftime("%Y-%m-%d"): like["total_likes"]
+            for like in likes_aggregated
+        }
 
-        return Response(likes_aggregated, status=status.HTTP_200_OK)
+        return Response(result, status=status.HTTP_200_OK)
